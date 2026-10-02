@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Video Studio</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111318;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    h1 { margin-bottom: 8px; }
+    p { color: #aaa; }
+
+    .card {
+      background: #1a1d24;
+      border: 1px solid #2b303a;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+
+    textarea, input, select {
+      width: 100%;
+      box-sizing: border-box;
+      background: #101217;
+      color: #fff;
+      border: 1px solid #343a46;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 8px;
+      margin-bottom: 16px;
+    }
+
+    textarea { min-height: 140px; resize: vertical; }
+
+    button {
+      background: #ff6b35;
+      color: white;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .status {
+      margin-top: 16px;
+      color: #8fd3ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>AI Video Studio</h1>
+    <p>Create videos from text using an AI video generation service.</p>
+
+    <div class="card">
+      <label>What do you want to create?</label>
+      <textarea id="prompt" placeholder="A cute 3D cartoon boy walking through a colorful park..."></textarea>
+
+      <label>Video style</label>
+      <select id="style">
+        <option>3D</option>
+        <option>Cartoon</option>
+        <option>Cinematic</option>
+        <option>Realistic</option>
+        <option>Anime</option>
+      </select>
+
+      <label>Aspect ratio</label>
+      <select id="ratio">
+        <option value="16:9">16:9</option>
+        <option value="9:16">9:16</option>
+        <option value="1:1">1:1</option>
+        <option value="4:5">4:5</option>
+      </select>
+
+      <button id="generateBtn">Generate Video</button>
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "http://127.0.0.1:8000";
+
+    document.getElementById("generateBtn").addEventListener("click", async () => {
+      const prompt = document.getElementById("prompt").value.trim();
+      const status = document.getElementById("status");
+
+      if (!prompt) {
+        status.textContent = "Please enter a prompt.";
+        return;
+      }
+
+      status.textContent = "Checking backend...";
+
+      try {
+        const response = await fetch(`${API_BASE}/api/health`);
+        const data = await response.json();
+
+        status.textContent =
+          `Backend connected: ${data.status}. Real video generation will be connected next.`;
+      } catch (error) {
+        status.textContent =
+          "Backend is not running yet.";
+      }
+    });
+  </script>
+</body>
+</html>

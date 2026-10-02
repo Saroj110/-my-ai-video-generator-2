@@ -1,0 +1,6 @@
+fastapi
+uvicorn[standard]
+python-multipart
+gradio_client
+pydantic
+python-dotenv
