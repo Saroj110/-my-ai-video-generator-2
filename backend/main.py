@@ -39,7 +39,7 @@ class VideoRequest(BaseModel):
         "camera shake, malformed anatomy"
     )
 
-    steps: int = 30
+    steps: int = 4
     guidance_scale: float = 5.0
     seed: int = -1
 
