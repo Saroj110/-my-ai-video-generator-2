@@ -53,22 +53,44 @@
       font-weight: 700;
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .status {
       margin-top: 16px;
       color: #8fd3ff;
+    }
+
+    video {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 12px;
+      background: #000;
+    }
+
+    .download {
+      display: inline-block;
+      margin-top: 12px;
+      background: #2a2f3a;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>AI Video Studio</h1>
-    <p>Create videos from text using an AI video generation service.</p>
+    <p>Text-to-Video powered by Wan 2.1</p>
 
     <div class="card">
       <label>What do you want to create?</label>
       <textarea id="prompt" placeholder="A cute 3D cartoon boy walking through a colorful park..."></textarea>
 
-      <label>Video style</label>
+      <label>Style</label>
       <select id="style">
         <option>3D</option>
         <option>Cartoon</option>
@@ -77,7 +99,7 @@
         <option>Anime</option>
       </select>
 
-      <label>Aspect ratio</label>
+      <label>Aspect Ratio</label>
       <select id="ratio">
         <option value="16:9">16:9</option>
         <option value="9:16">9:16</option>
@@ -85,34 +107,76 @@
         <option value="4:5">4:5</option>
       </select>
 
+      <label>Duration</label>
+      <select id="duration">
+        <option value="3">3 seconds</option>
+        <option value="4">4 seconds</option>
+        <option value="5" selected>5 seconds</option>
+      </select>
+
       <button id="generateBtn">Generate Video</button>
+
       <div id="status" class="status"></div>
+
+      <div id="result" style="display:none;">
+        <video id="video" controls></video>
+        <a id="download" class="download" download>Download Video</a>
+      </div>
     </div>
   </div>
 
   <script>
-    const API_BASE = "http://127.0.0.1:8000";
+    const generateBtn = document.getElementById("generateBtn");
+    const status = document.getElementById("status");
+    const result = document.getElementById("result");
+    const video = document.getElementById("video");
+    const download = document.getElementById("download");
 
-    document.getElementById("generateBtn").addEventListener("click", async () => {
+    generateBtn.addEventListener("click", async () => {
       const prompt = document.getElementById("prompt").value.trim();
-      const status = document.getElementById("status");
+      const style = document.getElementById("style").value;
+      const ratio = document.getElementById("ratio").value;
+      const duration = Number(document.getElementById("duration").value);
 
       if (!prompt) {
         status.textContent = "Please enter a prompt.";
         return;
       }
 
-      status.textContent = "Checking backend...";
+      generateBtn.disabled = true;
+      result.style.display = "none";
+      status.textContent = "Sending request to Wan video service...";
 
       try {
-        const response = await fetch(`${API_BASE}/api/health`);
+        const response = await fetch("/api/generate-video", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: `${style} style, ${prompt}`,
+            duration_seconds: duration,
+            aspect_ratio: ratio
+          })
+        });
+
         const data = await response.json();
 
-        status.textContent =
-          `Backend connected: ${data.status}. Real video generation will be connected next.`;
+        if (!response.ok) {
+          throw new Error(data.detail || "Video generation failed.");
+        }
+
+        const videoUrl = data.video_url;
+
+        video.src = videoUrl;
+        download.href = videoUrl;
+
+        result.style.display = "block";
+        status.textContent = "Video generated successfully.";
       } catch (error) {
-        status.textContent =
-          "Backend is not running yet.";
+        status.textContent = error.message;
+      } finally {
+        generateBtn.disabled = false;
       }
     });
   </script>
