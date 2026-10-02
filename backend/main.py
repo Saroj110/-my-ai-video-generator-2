@@ -121,4 +121,12 @@ def generate_video(request: VideoRequest):
         )
 
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
+
+
+FRONTEND_DIR = BASE_DIR.parent / "frontend"
+
+@app.get("/", include_in_schema=False)
+def serve_frontend():
+    return FileResponse(FRONTEND_DIR / "index.html")
