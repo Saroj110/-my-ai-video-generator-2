@@ -1,0 +1,103 @@
+{
+  "title": "Twinkle Twinkle Little Star",
+  "duration_seconds": 60,
+  "scene_duration_seconds": 5,
+  "scenes": [
+    {
+      "id": 1,
+      "start": 0,
+      "end": 5,
+      "title": "Night Sky",
+      "visual": "A cute little child looks out of a cozy bedroom window at night. The moon and many stars sparkle outside. Peaceful magical atmosphere.",
+      "audio": "Twinkle, twinkle, little star..."
+    },
+    {
+      "id": 2,
+      "start": 5,
+      "end": 10,
+      "title": "Star Appears",
+      "visual": "One bright friendly smiling star gently flies across the night sky, glowing warmly and leaving a tiny sparkling trail.",
+      "audio": "How I wonder what you are..."
+    },
+    {
+      "id": 3,
+      "start": 10,
+      "end": 15,
+      "title": "Above the Clouds",
+      "visual": "The camera slowly rises through soft fluffy clouds toward the shining star high above the world.",
+      "audio": "Up above the world so high..."
+    },
+    {
+      "id": 4,
+      "start": 15,
+      "end": 20,
+      "title": "Diamond Star",
+      "visual": "The main star sparkles brightly like a tiny diamond against a deep blue night sky, with beautiful glowing particles.",
+      "audio": "Like a diamond in the sky..."
+    },
+    {
+      "id": 5,
+      "start": 20,
+      "end": 25,
+      "title": "Child Waves",
+      "visual": "The child happily waves at the star from the bedroom window. The star twinkles back in a friendly way.",
+      "audio": "Twinkle, twinkle, little star..."
+    },
+    {
+      "id": 6,
+      "start": 25,
+      "end": 30,
+      "title": "Magical Sky",
+      "visual": "Many colorful stars appear around the smiling moon and gently dance in the magical night sky.",
+      "audio": "Gentle instrumental music"
+    },
+    {
+      "id": 7,
+      "start": 30,
+      "end": 35,
+      "title": "Star Dance",
+      "visual": "The main smiling star spins gracefully and leaves a glowing sparkling trail across the sky.",
+      "audio": "Twinkle, twinkle..."
+    },
+    {
+      "id": 8,
+      "start": 35,
+      "end": 40,
+      "title": "Friends Join",
+      "visual": "A cute bunny and a cuddly teddy bear join the child and look up happily at the magical starry sky.",
+      "audio": "How I wonder what you are..."
+    },
+    {
+      "id": 9,
+      "start": 40,
+      "end": 45,
+      "title": "Moon and Stars",
+      "visual": "A friendly smiling moon shines softly while many stars twinkle around it in a peaceful dreamy sky.",
+      "audio": "Up above the world so high..."
+    },
+    {
+      "id": 10,
+      "start": 45,
+      "end": 50,
+      "title": "Sparkle Magic",
+      "visual": "The main star sends tiny glowing sparkles floating gently down toward the child, bunny and teddy bear.",
+      "audio": "Like a diamond in the sky..."
+    },
+    {
+      "id": 11,
+      "start": 50,
+      "end": 55,
+      "title": "Goodnight",
+      "visual": "The child, bunny and teddy bear happily wave goodbye to the smiling star while the moon shines softly above.",
+      "audio": "Soft lullaby"
+    },
+    {
+      "id": 12,
+      "start": 55,
+      "end": 60,
+      "title": "Ending",
+      "visual": "The smiling star gives one large magical sparkle over the peaceful night sky. Elegant glowing text appears: Good Night! ⭐✨",
+      "audio": "Final Twinkle melody and gentle chime"
+    }
+  ]
+}
