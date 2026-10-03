@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
 import shutil
+import subprocess
 import uuid
 
 from fastapi import FastAPI, HTTPException
@@ -45,6 +46,8 @@ class ImageRequest(BaseModel):
 
 class VideoRequest(BaseModel):
     prompt: str
+    voice_over_text: str = ""
+    voice: str = "Hindi Female"
     aspect_ratio: str = "16:9"
     duration_seconds: float = 3.5
     steps: int = 6
@@ -139,6 +142,40 @@ def generate_image(request: ImageRequest):
         )
 
 
+def merge_video_audio(video_file: str, audio_file: str) -> str:
+    input_video = MEDIA_DIR / video_file
+    input_audio = MEDIA_DIR / audio_file
+    output_file = MEDIA_DIR / f"{uuid.uuid4().hex}_final.mp4"
+
+    command = [
+        "ffmpeg",
+        "-y",
+        "-i", str(input_video),
+        "-i", str(input_audio),
+        "-map", "0:v:0",
+        "-map", "1:a:0",
+        "-c:v", "copy",
+        "-c:a", "aac",
+        "-b:a", "192k",
+        "-shortest",
+        str(output_file),
+    ]
+
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=180,
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"FFmpeg audio merge failed: {result.stderr[-2000:]}"
+        )
+
+    return output_file.name
+
+
 @app.post("/api/create-video")
 def create_video(request: VideoRequest):
     prompt = request.prompt.strip()
@@ -208,9 +245,23 @@ def create_video(request: VideoRequest):
 
         video_filename = save_gradio_file(video_data, "mp4")
 
+        narration = request.voice_over_text.strip() or request.prompt.strip()
+        audio_filename = generate_tts(
+            narration,
+            request.voice,
+            MEDIA_DIR,
+        )
+
+        final_filename = merge_video_audio(
+            video_filename,
+            audio_filename,
+        )
+
         return {
             "status": "completed",
-            "video_url": f"/media/{video_filename}",
+            "video_url": f"/media/{final_filename}",
+            "audio_url": f"/media/{audio_filename}",
+            "voice": request.voice,
             "duration_seconds": request.duration_seconds,
             "aspect_ratio": request.aspect_ratio,
         }
