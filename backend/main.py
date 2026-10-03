@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from gradio_client import Client, handle_file
+from tts_service import generate_tts
 
 BASE_DIR = Path(__file__).resolve().parent
 MEDIA_DIR = BASE_DIR / "media"
@@ -226,3 +227,37 @@ app.mount(
     StaticFiles(directory=MEDIA_DIR),
     name="media",
 )
+
+
+class AudioRequest(BaseModel):
+    text: str
+    voice: str = "Hindi Female"
+
+
+@app.post("/api/generate-audio")
+def generate_audio(request: AudioRequest):
+    text = request.text.strip()
+
+    if not text:
+        raise HTTPException(status_code=400, detail="Text is required.")
+
+    if len(text) > 5000:
+        raise HTTPException(
+            status_code=400,
+            detail="Text is too long. Maximum is 5000 characters."
+        )
+
+    try:
+        filename = generate_tts(text, request.voice, MEDIA_DIR)
+
+        return {
+            "status": "completed",
+            "audio_url": f"/media/{filename}",
+            "voice": request.voice,
+        }
+
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=f"Audio generation failed: {exc}",
+        )
