@@ -124,6 +124,9 @@ def generate_full_video(job_id, storyboard_name, voice, jobs):
 
         scenes = storyboard["scenes"]
 
+        max_scenes = int(os.getenv("MAX_SCENES", str(len(scenes))))
+        scenes = scenes[:max_scenes]
+
         token = os.getenv("HF_TOKEN")
         if not token:
             raise RuntimeError("HF_TOKEN is missing.")
