@@ -1,0 +1,111 @@
+name: Generate Rhyme Video
+
+on:
+  workflow_dispatch:
+    inputs:
+      storyboard:
+        description: "Storyboard file name"
+        required: true
+        default: "twinkle_60s"
+        type: string
+
+      voice:
+        description: "Voice"
+        required: true
+        default: "Hindi Female"
+        type: choice
+        options:
+          - Hindi Female
+          - Hindi Male
+          - English Female
+          - English Male
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      VOICE: ${{ inputs.voice }}
+      STORYBOARD: ${{ inputs.storyboard }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install gradio_client requests
+
+      - name: Generate video
+        run: |
+          PYTHONPATH=backend python - <<'PY'
+          import json
+          import os
+          import sys
+          import uuid
+          from pathlib import Path
+
+          sys.path.insert(0, "backend")
+
+          from full_video_service import generate_full_video
+
+          job_id = uuid.uuid4().hex
+
+          jobs = {
+              job_id: {
+                  "status": "starting",
+                  "completed": 0,
+                  "total": 12
+              }
+          }
+
+          print("Starting rhyme:", os.environ["STORYBOARD"])
+          print("Voice:", os.environ["VOICE"])
+          print("Job ID:", job_id)
+
+          generate_full_video(
+              job_id,
+              os.environ["STORYBOARD"],
+              os.environ["VOICE"],
+              jobs
+          )
+
+          print(json.dumps(jobs[job_id], indent=2))
+
+          Path("job_id.txt").write_text(job_id, encoding="utf-8")
+
+          if jobs[job_id].get("status") != "completed":
+              raise SystemExit(
+                  jobs[job_id].get(
+                      "message",
+                      "Video generation failed."
+                  )
+              )
+          PY
+
+      - name: Upload generated video and scene files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twinkle-rhyme-video
+          path: |
+            job_id.txt
+            backend/media/jobs/
+          if-no-files-found: warn
+          retention-days: 7
