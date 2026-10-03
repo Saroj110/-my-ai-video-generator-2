@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import shutil
 import uuid
 
@@ -17,6 +18,10 @@ FRONTEND_DIR = BASE_DIR.parent / "frontend"
 
 QWEN_SPACE = "assembledchaos/qwen-image-2-1-studio"
 WAN_SPACE = "zerogpu-aoti/wan2-2-fp8da-aoti-faster"
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+if not HF_TOKEN:
+    raise RuntimeError("HF_TOKEN is not available in the environment.")
 
 app = FastAPI(title="AI Video Studio API")
 
@@ -151,7 +156,7 @@ def create_video(request: VideoRequest):
 
     try:
         # 1. Generate a high-quality reference image.
-        qwen = Client(QWEN_SPACE)
+        qwen = Client(QWEN_SPACE, token=HF_TOKEN)
 
         image_result = qwen.predict(
             prompt=prompt,
@@ -175,7 +180,7 @@ def create_video(request: VideoRequest):
             raise RuntimeError("Qwen returned no usable image file.")
 
         # 2. Animate that exact image with Wan2.2 I2V.
-        wan = Client(WAN_SPACE)
+        wan = Client(WAN_SPACE, token=HF_TOKEN)
 
         video_result = wan.predict(
             input_image=handle_file(image_path),
