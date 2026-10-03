@@ -90,6 +90,21 @@
       <label>What do you want to create?</label>
       <textarea id="prompt" placeholder="A cute 3D cartoon boy walking through a colorful park..."></textarea>
 
+      <label>Language</label>
+      <select id="language">
+        <option value="Hindi">Hindi</option>
+        <option value="English">English</option>
+      </select>
+
+      <label>Voice</label>
+      <select id="voice">
+        <option value="Hindi Female">Female</option>
+        <option value="Hindi Male">Male</option>
+      </select>
+
+      <label>Voice-over Text</label>
+      <textarea id="voiceText" placeholder="Write the narration you want to hear in the video..."></textarea>
+
       <label>Style</label>
       <select id="style">
         <option>3D</option>
@@ -135,11 +150,31 @@
     const video = document.getElementById("video");
     const download = document.getElementById("download");
 
+    const languageSelect = document.getElementById("language");
+    const voiceSelect = document.getElementById("voice");
+
+    languageSelect.addEventListener("change", () => {
+      if (languageSelect.value === "Hindi") {
+        voiceSelect.innerHTML = `
+          <option value="Hindi Female">Female</option>
+          <option value="Hindi Male">Male</option>
+        `;
+      } else {
+        voiceSelect.innerHTML = `
+          <option value="English Female">Female</option>
+          <option value="English Male">Male</option>
+        `;
+      }
+    });
+
     generateBtn.addEventListener("click", async () => {
       const prompt = document.getElementById("prompt").value.trim();
       const style = document.getElementById("style").value;
       const ratio = document.getElementById("ratio").value;
       const duration = Number(document.getElementById("duration").value);
+      const language = document.getElementById("language").value;
+      const voice = document.getElementById("voice").value;
+      const voiceText = document.getElementById("voiceText").value.trim();
 
       if (!prompt) {
         status.textContent = "Please enter a prompt.";
@@ -158,6 +193,8 @@
           },
           body: JSON.stringify({
             prompt: `${style} style, ${prompt}`,
+            voice_over_text: voiceText,
+            voice: voice,
             duration_seconds: duration,
             aspect_ratio: ratio
           })
