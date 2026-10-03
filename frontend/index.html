@@ -133,6 +133,9 @@
       </select>
 
       <button id="generateBtn">Generate Video</button>
+      <button id="storyboardBtn" type="button">Open Twinkle Storyboard</button>
+      <div id="storyboard" style="display:none; margin-top:20px;"></div>
+    
 
       <div id="status" class="status"></div>
 
@@ -144,6 +147,50 @@
   </div>
 
   <script>
+    
+    const storyboardBtn = document.getElementById("storyboardBtn");
+    const storyboardBox = document.getElementById("storyboard");
+
+    storyboardBtn.addEventListener("click", async () => {
+      storyboardBox.style.display = "block";
+      storyboardBox.textContent = "Loading storyboard...";
+
+      try {
+        const response = await fetch("/api/storyboard/twinkle_60s");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Could not load storyboard.");
+        }
+
+        storyboardBox.innerHTML = `
+          <h2>${data.title}</h2>
+          <p>Total duration: ${data.duration_seconds} seconds</p>
+          ${data.scenes.map(scene => `
+            <div style="
+              border:1px solid #343a46;
+              border-radius:10px;
+              padding:14px;
+              margin-top:10px;
+            ">
+              <strong>Scene ${scene.id}: ${scene.title}</strong>
+              <div style="color:#aaa; margin-top:6px;">
+                ${scene.start}s – ${scene.end}s
+              </div>
+              <div style="margin-top:8px;">
+                ${scene.visual}
+              </div>
+              <div style="color:#8fd3ff; margin-top:8px;">
+                Audio: ${scene.audio}
+              </div>
+            </div>
+          `).join("")}
+        `;
+      } catch (error) {
+        storyboardBox.textContent = error.message;
+      }
+    });
+
     const generateBtn = document.getElementById("generateBtn");
     const status = document.getElementById("status");
     const result = document.getElementById("result");

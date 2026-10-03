@@ -273,6 +273,24 @@ def create_video(request: VideoRequest):
         )
 
 
+@app.get("/api/storyboard/{name}")
+def get_storyboard(name: str):
+    storyboard_file = BASE_DIR / "storyboards" / f"{name}.json"
+
+    if not storyboard_file.exists():
+        raise HTTPException(status_code=404, detail="Storyboard not found.")
+
+    import json
+
+    try:
+        return json.loads(storyboard_file.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        raise HTTPException(
+            status_code=500,
+            detail="Storyboard JSON is invalid."
+        )
+
+
 app.mount(
     "/media",
     StaticFiles(directory=MEDIA_DIR),
